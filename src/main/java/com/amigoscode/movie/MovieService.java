@@ -1,57 +1,54 @@
 package com.amigoscode.movie;
 
-import com.amigoscode.exception.NotFoundException;
+import com.amigoscode.actor.ActorRepository;
+import com.amigoscode.actor.Actor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MovieService {
 
-    private final MovieDao movieDao;
+    private final MovieRepository movieRepository;
+    private final ActorRepository actorRepository;
 
-    public MovieService(MovieDao movieDao) {
-        this.movieDao = movieDao;
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository) {
+        this.movieRepository = movieRepository;
+        this.actorRepository = actorRepository;
     }
 
-    public List<Movie> getMovies() {
-        return movieDao.selectMovies();
+    public Iterable<Movie> getMovies() {
+        return movieRepository.findAll();
     }
 
-    public void addNewMovie(Movie movie) {
-        // TODO: check if movie exists
-        int result = movieDao.insertMovie(movie);
-        if (result != 1) {
-            throw new IllegalStateException("oops something went wrong");
-        }
+    public Movie addNewMovie(Movie movie) {
+        // TODO: Support many actors for one movie
+        return movieRepository.save(movie);
     }
 
-    public void deleteMovie(Integer id) {
-        Optional<Movie> movies = movieDao.selectMovieById(id);
-        movies.ifPresentOrElse(movie -> {
-            int result = movieDao.deleteMovie(id);
-            if (result != 1) {
-                throw new IllegalStateException("oops could not delete movie");
-            }
-        }, () -> {
-            throw new NotFoundException(String.format("Movie with id %s not found", id));
-        });
-    }
-
-    public Movie getMovie(int id) {
-        return movieDao.selectMovieById(id).orElseThrow(() -> new NotFoundException(String.format("Movie with id %s not found", id)));
-    }
-
-    public void updateMovie(int id, Movie movie) {
-        Optional<Movie> movies = movieDao.selectMovieById(id);
-        movies.ifPresentOrElse(m -> {
-            int result = movieDao.updateMovie(id, movie);
-            if (result != 1) {
-                throw new NotFoundException("oops could not delete movie");
-            }
-        }, () -> {
-            throw new NotFoundException(String.format("Movie with id %s not found", id));
-        });
-    }
+//    public void deleteMovie(Integer id) {
+//        Optional<Movie> movies = movieRepository.selectMovieById(id);
+//        movies.ifPresentOrElse(movie -> {
+//            int result = movieRepository.deleteMovie(id);
+//            if (result != 1) {
+//                throw new IllegalStateException("oops could not delete movie");
+//            }
+//        }, () -> {
+//            throw new NotFoundException(String.format("Movie with id %s not found", id));
+//        });
+//    }
+//
+//    public Movie getMovie(int id) {
+//        return movieRepository.selectMovieById(id).orElseThrow(() -> new NotFoundException(String.format("Movie with id %s not found", id)));
+//    }
+//
+//    public void updateMovie(int id, Movie movie) {
+//        Optional<Movie> movies = movieRepository.selectMovieById(id);
+//        movies.ifPresentOrElse(m -> {
+//            int result = movieRepository.updateMovie(id, movie);
+//            if (result != 1) {
+//                throw new NotFoundException("oops could not delete movie");
+//            }
+//        }, () -> {
+//            throw new NotFoundException(String.format("Movie with id %s not found", id));
+//        });
+//    }
 }
